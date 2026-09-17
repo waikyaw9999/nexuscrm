@@ -1,0 +1,38 @@
+# Java
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+!**/src/main/**/lib/*.jar
+
+# Node
+**/node_modules/
+**/dist/
+**/.turbo/
+npm-debug.log*
+.pnpm-store/
+
+# Env / secrets
+.env
+.env.local
+*.pem
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test / coverage
+coverage/
+.nyc_output/

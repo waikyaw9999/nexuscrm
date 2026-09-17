@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: nexuscrm-api
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/nexuscrm}
+    username: ${DATABASE_USER:nexus}
+    password: ${DATABASE_PASSWORD:nexus}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+nexus:
+  jwt:
+    secret: ${NEXUS_JWT_SECRET:dev-only-change-me-please-use-32chars}
+    access-ttl: PT15M
+    refresh-ttl: P14D
+  encryption-key: ${NEXUS_ENCRYPTION_KEY:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+  bff-api-key: ${NEXUS_BFF_API_KEY:dev-bff-key}
+  bff-origin: ${NEXUS_BFF_ORIGIN:http://localhost:3001}
+  seed: ${NEXUS_SEED:true}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8088/bff/oauth/gmail/callback}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:nexuscrm;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+nexus:
+  jwt:
+    secret: test-secret-please-use-at-least-32-chars
+  encryption-key: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  bff-api-key: test-bff-key
+  seed: false
