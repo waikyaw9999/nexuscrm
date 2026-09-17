@@ -81,11 +81,17 @@ class MockMailboxProviderTest {
 class AuthAndIsolationTest {
     @Autowired
     MockMvc mvc;
+    @Autowired
+    NexusProperties properties;
+
+    private String bffKey() {
+        return properties.getBffApiKey();
+    }
 
     @Test
     void loginRejectsBadPassword() throws Exception {
         mvc.perform(post("/api/v1/auth/register")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"owner@acme.test","password":"Secret123!","fullName":"Owner","organizationName":"Acme"}
@@ -93,7 +99,7 @@ class AuthAndIsolationTest {
                 .andExpect(status().isCreated());
 
         mvc.perform(post("/api/v1/auth/login")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"owner@acme.test","password":"wrong"}
@@ -108,7 +114,7 @@ class AuthAndIsolationTest {
         String tokenB = register("b@tenant.test", "Beta Org");
 
         mvc.perform(post("/api/v1/contacts")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .header("Authorization", "Bearer " + tokenA)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -117,7 +123,7 @@ class AuthAndIsolationTest {
                 .andExpect(status().isCreated());
 
         mvc.perform(get("/api/v1/contacts")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .header("Authorization", "Bearer " + tokenB))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(0));
@@ -127,7 +133,7 @@ class AuthAndIsolationTest {
     void dealsListWorksWithoutSearchQuery() throws Exception {
         String token = register("deals@tenant.test", "Deals Org");
         mvc.perform(post("/api/v1/deals")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -136,7 +142,7 @@ class AuthAndIsolationTest {
                 .andExpect(status().isCreated());
 
         mvc.perform(get("/api/v1/deals")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Warehouse automation"));
@@ -144,7 +150,7 @@ class AuthAndIsolationTest {
 
     private String register(String email, String org) throws Exception {
         String json = mvc.perform(post("/api/v1/auth/register")
-                        .header("X-BFF-Key", "test-bff-key")
+                        .header("X-BFF-Key", bffKey())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","password":"Secret123!","fullName":"Pat Lee","organizationName":"%s"}
