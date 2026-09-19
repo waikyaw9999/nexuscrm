@@ -11,6 +11,12 @@ cp .env.example .env
 docker compose up --build
 ```
 
+To rebuild only the Spring API image (no Alpine `apk add wget`):
+
+```bash
+docker compose build api
+```
+
 Open [http://localhost:8088](http://localhost:8088).
 
 **Demo login**
@@ -96,7 +102,7 @@ IMAP/SMTP mailboxes are connected via `POST /api/v1/mailboxes/imap` (host, ports
 ## API & health
 
 - OpenAPI UI (from a trusted network / via BFF in production): [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- API health: `GET /actuator/health`
+- API health: `GET /actuator/health` (Compose/image healthcheck uses `apps/api/docker-healthcheck.sh` over bash `/dev/tcp`, not `wget`)
 - BFF health: `GET /bff/health`
 - Error shape: `{ "code": "...", "message": "...", "details": optional }`
 
